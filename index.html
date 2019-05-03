@@ -3,11 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <title>SVG Page</title>
-    <link rel="stylesheet" href="style.css" />
+		<link rel="stylesheet" href="style.css" />
+ </head>
   </head>
   <body>
     <main>
-      <svg id="svg1" version="1.1" viewBox="0 0 178 254" xmlns="http://www.w3.org/2000/svg">
+      <svg class="page active" version="1.1" viewBox="0 0 178 254" xmlns="http://www.w3.org/2000/svg">
         <image id="image1" width="178" height="254" clip-path="url('#ClipPath1')" xlink:href="https://i.imgur.com/yiZFUK4.jpg" />
         <g clip-path="url('#ClipPath1')">
           <polygon fill="transparent" points="12,13 88,13 88,49 12,49"></polygon>
@@ -20,13 +21,13 @@
           <polygon fill="transparent" points="12,198 79,198 79,235 12,235"></polygon>
           <polygon fill="transparent" points="12,152 166,152 166,235 12,235"></polygon>
         </g>
-        <defs id="Defs1">
+        <defs>
           <clipPath id="ClipPath1">
-            <rect id="Rect1" width="100%" height="100%" x="0" y="0"></rect>
+            <rect class="rect" width="100%" height="100%" x="0" y="0"></rect>
           </clipPath>
         </defs>
       </svg>
-      <svg id="svg2" version="1.1" viewBox="0 0 178 254" xmlns="http://www.w3.org/2000/svg">
+      <svg class="page" version="1.1" viewBox="0 0 178 254" xmlns="http://www.w3.org/2000/svg">
         <image id="image2" width="178" height="254" clip-path="url('#ClipPath2')" xlink:href="https://i.imgur.com/Db7V9yK.jpg" />
         <g clip-path="url('#ClipPath2')">
           <polygon fill="transparent" points="11,9 110,9 110,122 11,122"></polygon>
@@ -34,13 +35,13 @@
           <polygon fill="transparent" points="11,127 108,127 108,240 11,240"></polygon>
           <polygon fill="transparent" points="66,127 168,127 168,240 66,240"></polygon>
         </g>
-        <defs id="Defs2">
+        <defs>
           <clipPath id="ClipPath2">
-            <rect id="Rect2" width="100%" height="100%" x="0" y="0"></rect>
+            <rect class="rect" width="100%" height="100%" x="0" y="0"></rect>
           </clipPath>
         </defs>
       </svg>
-      <svg id="svg3" version="1.1" viewBox="0 0 178 254" xmlns="http://www.w3.org/2000/svg">
+      <svg class="page" version="1.1" viewBox="0 0 178 254" xmlns="http://www.w3.org/2000/svg">
         <image id="image3" width="178" height="254" clip-path="url('#ClipPath3')" xlink:href="https://i.imgur.com/mnM4XAZ.jpg" />
         <g clip-path="url('#ClipPath3')">
           <polygon fill="transparent" points="11,13 94,13 94,47 11,47"></polygon>
@@ -48,9 +49,9 @@
           <polygon fill="transparent" points="94,186 166,186 166,233 94,233"></polygon>
           <polygon fill="transparent" points="11,13 166,13 166,234 11,234"></polygon>
         </g>
-        <defs id="Defs3">
+        <defs>
           <clipPath id="ClipPath3">
-            <rect id="Rect3" width="100%" height="100%" x="0" y="0"></rect>
+            <rect class="rect" width="100%" height="100%" x="0" y="0"></rect>
           </clipPath>
         </defs>
       </svg>
@@ -59,12 +60,13 @@
 			</div>
 		</main>
 		<nav>
-			<button id="pg-prev">Back</button>
-			<button id="pg-swi">Switch</button>
-			<button id="pg-zoom">Zoom</button>
-			<button id="pg-fscr">Full Screen</button>
-			<button id="pg-allpg">All Pages</button>
-			<button id="pg-nxt">Next</button>
+			<button id="prev" disabled>Back</button>
+			<button id="switch">Switch</button>
+			<button id="zoom">Zoom</button>
+			<button id="full">Full Screen</button>
+			<button id="all">All Pages</button>
+			<button id="next">Next</button>
 		</nav>
+		<script src="script.js"></script>
   </body>
 </html>
