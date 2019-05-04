@@ -76,3 +76,15 @@ nav .hidden {
 #end.active {
   display: block;
 }
+
+#switch span:last-child {
+  display: none;
+}
+
+#switch.active span:last-child {
+  display: inline;
+}
+
+#switch.active span:first-child {
+  display: none;
+}

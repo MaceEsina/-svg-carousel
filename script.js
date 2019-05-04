@@ -17,6 +17,7 @@
   var pageIndex = 0;
   var areaIndex = 0;
   var activePage = pages[pageIndex];
+  var activeRect;
 
   nextButton.addEventListener('click', next);
   prevButton.addEventListener('click', prev);
@@ -68,7 +69,6 @@
     }
 
     var activeArea = areas[areaIndex];
-    var activeRect = rects[pageIndex - 1];
     var points = activeArea.getAttribute('points').split(' ');
     var xy1 = points[0].split(',');
     var xy2 = points[1].split(',');
@@ -76,6 +76,7 @@
     var box = [xy1[0], xy1[1], xy2[0] - xy1[0], xy3[1] - xy2[1]];
 
     pages[pageIndex].setAttribute('viewBox', box.join(' '));
+    activeRect = rects[pageIndex - 1];
     activeRect.setAttribute('x', xy1[0]);
     activeRect.setAttribute('y', xy1[1]);
   }
@@ -86,7 +87,7 @@
     activePage = pages[pageIndex];
     activePage.classList.add('active');
     areas = getAreas(activePage);
-    areaIndex = 0;
+    areaIndex = isNext ? 0 : areas.length - 1;
   }
 
   function updateNavButton(isNext) {
@@ -115,13 +116,21 @@
     }
   }
 
-  function switchMode() {
-    debugger
+  function switchMode(evt) {
     isPageMode = !isPageMode;
+    evt.currentTarget.classList[isPageMode ? 'add' : 'remove']('active');
+
+    if (isFirstPage() || isLastPage()) {
+      return;
+    }
 
     if (isPageMode) {
-      pages[pageIndex].setAttribute('viewBox', viewBoxes[pageIndex - 1]);
+      pages[pageIndex].setAttribute('viewBox', viewBoxes[pageIndex]);
+      activeRect = rects[pageIndex - 1];
+      activeRect.setAttribute('x', 0);
+      activeRect.setAttribute('y', 0);
     } else {
+      areaIndex = 0;
       changeArea();
     }
   }
