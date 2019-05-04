@@ -57,10 +57,22 @@ nav button {
   cursor: pointer;
 }
 
+nav .hidden {
+  visibility: hidden;
+}
+
 #end {
   display: none;
 }
 
-#end.visible {
+#end,
+#start {
+  color: white;
+  font-size: 30px;
+  padding: 20px;
+  text-align: center;
+}
+
+#end.active {
   display: block;
 }
