@@ -27,11 +27,13 @@
 
   var isPageMode = false;
   var isFullScreen = false;
+  var isContentVisible = false;
+
   var pageIndex = 0;
   var areaIndex = 0;
   var areas = getAreas(pages[1]);
   var activePage = pages[pageIndex];
-  var activeRect, i;
+  var activeRect, x1 = null, y1 = null, i;
 
   nextButton.addEventListener('click', next);
   prevButton.addEventListener('click', prev);
@@ -40,9 +42,39 @@
   backButton.addEventListener('click', hideContentsPage);
   fullScreenButton.addEventListener('click', toggleFullScreen);
 
+  document.addEventListener('touchstart', handleTouchStart, false);
+  document.addEventListener('touchmove', handleTouchMove, false);
+
   for (i = 0; i < selectPages.length; i++) {
     selectPages[i].addEventListener('click', selectPage.bind(null, i));
   }
+
+  function handleTouchStart(evt) {
+    x1 = evt.touches.clientX;
+    y1 = evt.touches.clientY;
+  };
+
+  function handleTouchMove(evt) {
+    if ( isContentVisible || x1 === null || y1 === null ) {
+      return;
+    }
+
+    var x2 = evt.touches[0].clientX;
+    var y2 = evt.touches[0].clientY;
+    var xDiff = x1 - x2;
+    var yDiff = y1 - y2;
+
+    if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {
+      if ( xDiff > 0 ) {
+        prev();
+      } else {
+        next();
+      }
+    }
+
+    x1 = null;
+    x2 = null;
+};
 
   function selectPage(index) {
     pages[pageIndex].classList.remove('active');
@@ -205,6 +237,7 @@
       selectPages[pageIndex - 1].classList.add('active');
     }
 
+    isContentVisible = true;
     contentsPage.classList.add('active');
   }
 
@@ -215,6 +248,7 @@
       }
     }, AREA_DELAY);
 
+    isContentVisible = false;
     contentsPage.classList.remove('active');
   }
 
