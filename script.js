@@ -1,8 +1,7 @@
 (function() {
   'use strict';
 
-  var PAGE_DELAY = 700;
-  var AREA_DELAY = 400;
+  var DELAY = 400;
 
   var body = document.body;
   var setFullScreen = body.requestFullScreen || body.webkitRequestFullScreen
@@ -14,6 +13,7 @@
   var nextButton = document.getElementById('next');
   var prevButton = document.getElementById('prev');
   var backButton = document.getElementById('back');
+  var zoomButton = document.getElementById('zoom');
   var switchButton = document.getElementById('switch');
   var fullScreenButton = document.getElementById('full');
 
@@ -28,6 +28,7 @@
   var isPageMode = false;
   var isFullScreen = false;
   var isContentVisible = false;
+  var isZoomOn = false;
 
   var pageIndex = 0;
   var areaIndex = 0;
@@ -35,27 +36,44 @@
   var activePage = pages[pageIndex];
   var activeRect, x1 = null, y1 = null, i;
 
-  nextButton.addEventListener('click', next);
-  prevButton.addEventListener('click', prev);
+  nextButton.addEventListener('click', throttle(next));
+  prevButton.addEventListener('click', throttle(prev));
   switchButton.addEventListener('click', switchMode);
   allButton.addEventListener('click', showContentsPage);
   backButton.addEventListener('click', hideContentsPage);
+  zoomButton.addEventListener('click', toggleZoom);
   fullScreenButton.addEventListener('click', toggleFullScreen);
 
-  document.addEventListener('touchstart', handleTouchStart, false);
-  document.addEventListener('touchmove', handleTouchMove, false);
+  document.addEventListener('touchstart', throttle(handleTouchStart), false);
+  document.addEventListener('touchmove', throttle(handleTouchMove), false);
 
   for (i = 0; i < selectPages.length; i++) {
     selectPages[i].addEventListener('click', selectPage.bind(null, i));
   }
 
+  function throttle(func) {
+    var inThrottle;
+
+    return function() {
+      var context = this;
+      var args = arguments;
+      if (!inThrottle) {
+        func.apply(context, args);
+        inThrottle = true
+        setTimeout(function() {
+          inThrottle = false;
+        }, DELAY);
+      }
+    }
+  }
+
   function handleTouchStart(evt) {
-    x1 = evt.touches.clientX;
-    y1 = evt.touches.clientY;
+    x1 = evt.touches[0].clientX;
+    y1 = evt.touches[0].clientY;
   };
 
   function handleTouchMove(evt) {
-    if ( isContentVisible || x1 === null || y1 === null ) {
+    if (isContentVisible || x1 === null || y1 === null) {
       return;
     }
 
@@ -64,16 +82,12 @@
     var xDiff = x1 - x2;
     var yDiff = y1 - y2;
 
-    if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {
-      if ( xDiff > 0 ) {
-        prev();
-      } else {
-        next();
-      }
+    if (Math.abs(xDiff) > Math.abs(yDiff)) {
+      xDiff < 0 ? prev() : next();
     }
 
     x1 = null;
-    x2 = null;
+    y1 = null;
 };
 
   function selectPage(index) {
@@ -87,31 +101,38 @@
       changeArea();
     }
 
-    nextButton.classList.remove('hidden');
-    prevButton.classList.remove('hidden');
+    updateNavButton();
     setTimeout(function() {
       body.classList.remove('fade');
-    }, AREA_DELAY);
+    }, DELAY);
   }
 
   function next() {
+    if (isLastPage()) {
+      return;
+    }
+
     if (isPageMode) {
       changePage(true);
     } else {
       nextArea();
     }
 
-    updateNavButton(true);
+    updateNavButton();
   }
 
   function prev() {
+    if (isFirstPage()) {
+      return;
+    }
+
     if (isPageMode) {
       changePage(false);
     } else {
       prevArea();
     }
 
-    updateNavButton(false);
+    updateNavButton();
   }
 
   function fade() {
@@ -126,7 +147,7 @@
     } else {
       fade();
       areaIndex++;
-      setTimeout(changeArea, AREA_DELAY);
+      setTimeout(changeArea, DELAY);
     }
   }
 
@@ -137,7 +158,7 @@
     } else {
       fade();
       areaIndex--;
-      setTimeout(changeArea, AREA_DELAY);
+      setTimeout(changeArea, DELAY);
     }
   }
 
@@ -169,19 +190,7 @@
     areaIndex = isNext ? 0 : areas.length - 1;
   }
 
-  function updateNavButton(isNext) {
-    if (isPageMode) {
-      var button1 = isNext ? nextButton : prevButton;
-      var button2 = !isNext ? nextButton : prevButton;
-
-      button1.disabled = true;
-      button2.disabled = false;
-
-      setTimeout(function() {
-        button1.disabled = false;
-      }, PAGE_DELAY);
-    }
-
+  function updateNavButton() {
     if (isLastPage()) {
       nextButton.classList.add('hidden');
     } else {
@@ -205,8 +214,10 @@
 
     if (isPageMode) {
       restoreViewBox();
+      zoomButton.disabled = false;
     } else {
       areaIndex = 0;
+      zoomButton.disabled = true;
       changeArea();
     }
   }
@@ -246,7 +257,7 @@
       for (i = 0; i < selectPages.length; i++) {
         selectPages[i].classList.remove('active');
       }
-    }, AREA_DELAY);
+    }, DELAY);
 
     isContentVisible = false;
     contentsPage.classList.remove('active');
@@ -260,5 +271,15 @@
 
     isFullScreen && fullScreenButton.classList.add('active');
     !isFullScreen && fullScreenButton.classList.remove('active');
+  }
+
+  function toggleZoom() {
+    isZoomOn = !isZoomOn;
+
+    if (isZoomOn) {
+      zoomButton.classList.add('active');
+    } else {
+      zoomButton.classList.remove('active');
+    }
   }
 })();

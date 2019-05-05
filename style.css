@@ -15,7 +15,7 @@ button {
 main {
   height: 100%;
   width: 100%;
-  position: relative;
+  position: fixed;
   overflow: hidden;
 }
 
@@ -67,7 +67,6 @@ nav.active {
 nav button {
   margin: 8px;
   padding: 8px 10px;
-  color: black;
 }
 
 nav .hidden {
@@ -111,6 +110,19 @@ nav .hidden {
 }
 
 #full.active span:first-child {
+  display: none;
+}
+
+
+#zoom span:last-child {
+  display: none;
+}
+
+#zoom.active span:last-child {
+  display: inline;
+}
+
+#zoom.active span:first-child {
   display: none;
 }
 
