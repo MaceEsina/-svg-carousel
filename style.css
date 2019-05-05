@@ -3,6 +3,13 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+  font-family: sans-serif;
+  background: black;
+}
+
+button {
+  cursor: pointer;
+  outline: none;
 }
 
 main {
@@ -10,7 +17,10 @@ main {
   width: 100%;
   position: relative;
   overflow: hidden;
-  background: grey;
+}
+
+.fade .page {
+  transition: opacity .4s linear;
 }
 
 .page {
@@ -21,9 +31,13 @@ main {
   position: absolute;
   top: 0;
   left: -100%;
-  transition: all .7s ease;
+  opacity: 1;
+  transition: all .7s, opacity .4s linear;
   background: transparent;
-  z-index: 1;
+}
+
+.page.fade {
+  opacity: 0;
 }
 
 .page.active {
@@ -33,14 +47,13 @@ main {
 
 .page.active + .page {
   left: 100%;
-
 }
 
 nav {
   position: absolute;
   bottom: 0;
   left: 0;
-  z-index: 99;
+  z-index: 1;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -54,7 +67,7 @@ nav.active {
 nav button {
   margin: 8px;
   padding: 8px 10px;
-  cursor: pointer;
+  color: black;
 }
 
 nav .hidden {
@@ -87,4 +100,91 @@ nav .hidden {
 
 #switch.active span:first-child {
   display: none;
+}
+
+#full span:last-child {
+  display: none;
+}
+
+#full.active span:last-child {
+  display: inline;
+}
+
+#full.active span:first-child {
+  display: none;
+}
+
+#contents {
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  background: black;
+}
+
+#contents.active {
+  display: block;
+}
+
+#container {
+  width: 890px;
+  margin: 0 auto;
+}
+
+.select-page img {
+  width: auto;
+  margin: 0 auto;
+  height: 100%;
+}
+
+.select-page {
+  width: 267px;
+  height: 381px;
+  display: inline-block;
+  margin: 10px;
+  position: relative;
+  border: 3px solid black;
+  cursor: pointer;
+}
+
+.select-page.active {
+  border-color: #f0141e;
+}
+
+.select-page span {
+  display: block;
+  width: 70px;
+  height: 70px;
+  line-height: 70px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%,-50%);
+  -ms-transform: translate(-50%,-50%);
+  transform: translate(-50%,-50%);
+  background: rgba(0,0,0,.65);
+  font-weight: 700;
+  font-size: 45px;
+  text-align: center;
+  color: white;
+}
+
+#back {
+  margin: 30px 0 10px 30px;
+}
+
+
+@media (max-width: 890px) {
+  #container {
+    width: 595px;
+  }
+}
+
+@media (max-width: 595px) {
+  #container {
+    width: 295px;
+  }
 }

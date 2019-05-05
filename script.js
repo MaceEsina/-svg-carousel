@@ -1,27 +1,66 @@
 (function() {
   'use strict';
-  var DELAY = 700;
 
+  var PAGE_DELAY = 700;
+  var AREA_DELAY = 400;
+
+  var body = document.body;
+  var setFullScreen = body.requestFullScreen || body.webkitRequestFullScreen
+    || body.mozRequestFullScreen || body.msRequestFullScreen;
+  var exitFullscreen = document.exitFullscreen || document.webkitExitFullscreen
+    || document.mozCancelFullScreen || document.msExitFullscreen;
+
+  var allButton = document.getElementById('all');
   var nextButton = document.getElementById('next');
   var prevButton = document.getElementById('prev');
+  var backButton = document.getElementById('back');
   var switchButton = document.getElementById('switch');
+  var fullScreenButton = document.getElementById('full');
 
+  var contentsPage = document.getElementById('contents');
   var pages = document.getElementsByClassName('page');
   var rects = document.getElementsByClassName('rect');
-  var areas = getAreas(pages[1]);
+  var selectPages = document.getElementsByClassName('select-page');
   var viewBoxes = [].map.call(pages, function(page) {
     return page.getAttribute('viewBox');
   });
 
   var isPageMode = false;
+  var isFullScreen = false;
   var pageIndex = 0;
   var areaIndex = 0;
+  var areas = getAreas(pages[1]);
   var activePage = pages[pageIndex];
-  var activeRect;
+  var activeRect, i;
 
   nextButton.addEventListener('click', next);
   prevButton.addEventListener('click', prev);
   switchButton.addEventListener('click', switchMode);
+  allButton.addEventListener('click', showContentsPage);
+  backButton.addEventListener('click', hideContentsPage);
+  fullScreenButton.addEventListener('click', toggleFullScreen);
+
+  for (i = 0; i < selectPages.length; i++) {
+    selectPages[i].addEventListener('click', selectPage.bind(null, i));
+  }
+
+  function selectPage(index) {
+    pages[pageIndex].classList.remove('active');
+    pageIndex = index;
+    body.classList.add('fade');
+    hideContentsPage();
+    changePage(true);
+
+    if (!isPageMode) {
+      changeArea();
+    }
+
+    nextButton.classList.remove('hidden');
+    prevButton.classList.remove('hidden');
+    setTimeout(function() {
+      body.classList.remove('fade');
+    }, AREA_DELAY);
+  }
 
   function next() {
     if (isPageMode) {
@@ -43,24 +82,31 @@
     updateNavButton(false);
   }
 
+  function fade() {
+    activePage = pages[pageIndex];
+    activePage.classList.add('fade');
+  }
+
   function nextArea() {
     if (isFirstPage() || areaIndex >= areas.length - 1) {
       changePage(true);
+      changeArea();
     } else {
+      fade();
       areaIndex++;
+      setTimeout(changeArea, AREA_DELAY);
     }
-
-    changeArea();
   }
 
   function prevArea() {
     if (isLastPage() || areaIndex <= 0) {
       changePage(false);
+      changeArea();
     } else {
+      fade();
       areaIndex--;
+      setTimeout(changeArea, AREA_DELAY);
     }
-
-    changeArea();
   }
 
   function changeArea() {
@@ -75,7 +121,8 @@
     var xy3 = points[2].split(',');
     var box = [xy1[0], xy1[1], xy2[0] - xy1[0], xy3[1] - xy2[1]];
 
-    pages[pageIndex].setAttribute('viewBox', box.join(' '));
+    activePage.classList.remove('fade');
+    activePage.setAttribute('viewBox', box.join(' '));
     activeRect = rects[pageIndex - 1];
     activeRect.setAttribute('x', xy1[0]);
     activeRect.setAttribute('y', xy1[1]);
@@ -100,7 +147,7 @@
 
       setTimeout(function() {
         button1.disabled = false;
-      }, DELAY);
+      }, PAGE_DELAY);
     }
 
     if (isLastPage()) {
@@ -125,13 +172,19 @@
     }
 
     if (isPageMode) {
-      pages[pageIndex].setAttribute('viewBox', viewBoxes[pageIndex]);
-      activeRect = rects[pageIndex - 1];
-      activeRect.setAttribute('x', 0);
-      activeRect.setAttribute('y', 0);
+      restoreViewBox();
     } else {
       areaIndex = 0;
       changeArea();
+    }
+  }
+
+  function restoreViewBox() {
+    for (i = 1; i < pages.length - 1; i++) {
+      pages[i].setAttribute('viewBox', viewBoxes[i]);
+      activeRect = rects[i - 1];
+      activeRect.setAttribute('x', 0);
+      activeRect.setAttribute('y', 0);
     }
   }
 
@@ -145,5 +198,33 @@
 
   function isLastPage() {
     return pageIndex >= pages.length - 1;
+  }
+
+  function showContentsPage() {
+    if (!isFirstPage() && !isLastPage()) {
+      selectPages[pageIndex - 1].classList.add('active');
+    }
+
+    contentsPage.classList.add('active');
+  }
+
+  function hideContentsPage() {
+    setTimeout(function() {
+      for (i = 0; i < selectPages.length; i++) {
+        selectPages[i].classList.remove('active');
+      }
+    }, AREA_DELAY);
+
+    contentsPage.classList.remove('active');
+  }
+
+  function toggleFullScreen() {
+    isFullScreen = !isFullScreen;
+
+    isFullScreen && setFullScreen && setFullScreen.call(body);
+    !isFullScreen && exitFullscreen && exitFullscreen.call(document);
+
+    isFullScreen && fullScreenButton.classList.add('active');
+    !isFullScreen && fullScreenButton.classList.remove('active');
   }
 })();
