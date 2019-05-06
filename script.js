@@ -3,6 +3,7 @@
 
   var DELAY = 400;
   var ZOOM = 3;
+  var ZOOM_SELECTOR = '.svg-pan-zoom_viewport';
 
   var body = document.body;
   var setFullScreen = body.requestFullScreen || body.webkitRequestFullScreen
@@ -75,6 +76,7 @@
 
     x1 = evt.touches[0].clientX;
     y1 = evt.touches[0].clientY;
+    evt.preventDefault();
   };
 
   function handleTouchMove(evt) {
@@ -93,6 +95,7 @@
 
     x1 = null;
     y1 = null;
+    evt.preventDefault();
 };
 
   function selectPage(index) {
@@ -218,7 +221,7 @@
 
   function switchMode(evt) {
     isPageMode = !isPageMode;
-    evt.currentTarget.classList[isPageMode ? 'add' : 'remove']('active');
+    evt.currentTarget.classList.toggle('active');
     updateNavButton();
 
     if (isFirstPage() || isLastPage()) {
@@ -286,14 +289,10 @@
   }
 
   function toggleZoom() {
-    isZoomOn = !isZoomOn;
-
     if (isZoomOn) {
-      zoomButton.classList.add('active');
-      zoomOn();
-    } else {
-      zoomButton.classList.remove('active');
       zoomOff();
+    } else {
+      zoomOn();
     }
   }
 
@@ -303,6 +302,8 @@
     }
 
     var panZoom = activePage.panZoom;
+    zoomButton.classList.add('active');
+    isZoomOn = true;
 
     if (panZoom) {
       panZoom.pan({ x: 0, y: 0 });
@@ -347,19 +348,31 @@
   }
 
   function zoomOff() {
-    var panZoom;
+    var panZoom, panZoomElem, i;
+    zoomButton.classList.remove('active');
+    isZoomOn = false;
 
-    for (var i = 1; i < pages.length - 1; i++) {
+    for (i = 1; i < pages.length - 1; i++) {
       panZoom = pages[i].panZoom;
 
       if (panZoom) {
         panZoom.destroy();
         pages[i].classList.remove('zoom-on');
-        pages[i].classList.add('zoom-off');
         pages[i].panZoom = null;
       }
     }
 
+    setTimeout(function() {
+      for (i = 1; i < pages.length - 1; i++) {
+        panZoomElem = pages[i].querySelector(ZOOM_SELECTOR);
+        panZoomElem && panZoomElem.removeAttribute('transform');
+        panZoomElem && panZoomElem.removeAttribute('style');
+      }
+
+      activePage.classList.remove('hidden');
+    }, 50);
+
+    activePage.classList.add('hidden');
     restoreViewBox();
   }
 })();

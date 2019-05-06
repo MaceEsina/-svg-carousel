@@ -40,6 +40,10 @@ main {
   opacity: 0;
 }
 
+.page.hidden {
+  display: none;
+}
+
 .page.active {
   visibility: visible;
   left: 0;
@@ -49,16 +53,8 @@ main {
   left: 100%;
 }
 
-.page.zoom-off .svg-pan-zoom_viewport {
-  transform: none !important;
-}
-
 .page.zoom-on {
   cursor: grab;
-}
-
-.page.zoom-on .svg-pan-zoom_viewport {
-  transform: '';
 }
 
 nav {
