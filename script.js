@@ -2,6 +2,7 @@
   'use strict';
 
   var DELAY = 400;
+  var ZOOM = 3;
 
   var body = document.body;
   var setFullScreen = body.requestFullScreen || body.webkitRequestFullScreen
@@ -309,7 +310,7 @@
 
       activePage.panZoom = panZoom;
       activePage.isInit = true;
-      activePage.panZoom.zoom(2);
+      activePage.panZoom.zoom(ZOOM);
       activePage.classList.add('zoom-on');
       activePage.classList.remove('zoom-off');
     }

@@ -53,6 +53,10 @@ main {
   transform: none !important;
 }
 
+.page.zoom-on {
+  cursor: grab;
+}
+
 .page.zoom-on .svg-pan-zoom_viewport {
   transform: '';
 }
