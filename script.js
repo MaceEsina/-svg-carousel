@@ -194,17 +194,19 @@
   function updateNavButton() {
     if (isLastPage()) {
       nextButton.classList.add('hidden');
-      zoomButton.disabled = true;
     } else {
-      zoomButton.disabled = !isPageMode;
       nextButton.classList.remove('hidden');
     }
 
     if (isFirstPage()) {
       prevButton.classList.add('hidden');
-      zoomButton.disabled = true;
     } else {
       prevButton.classList.remove('hidden');
+    }
+
+    if (isFirstPage() || isLastPage()) {
+      zoomButton.disabled = true;
+    } else {
       zoomButton.disabled = !isPageMode;
     }
   }
@@ -290,6 +292,10 @@
   }
 
   function zoomOn() {
+    if (isFirstPage() || isLastPage()) {
+      return;
+    }
+
     var panZoom = activePage.panZoom;
 
     if (panZoom) {
@@ -341,7 +347,6 @@
       panZoom = pages[i].panZoom;
 
       if (panZoom) {
-        // panZoom.reset();
         panZoom.destroy();
         pages[i].classList.remove('zoom-on');
         pages[i].classList.add('zoom-off');
