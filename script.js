@@ -34,7 +34,7 @@
   var areaIndex = 0;
   var areas = getAreas(pages[1]);
   var activePage = pages[pageIndex];
-  var activeRect, x1 = null, y1 = null, i;
+  var activeRect, x1 = null, y1 = null;
 
   nextButton.addEventListener('click', throttle(next));
   prevButton.addEventListener('click', throttle(prev));
@@ -47,7 +47,7 @@
   document.addEventListener('touchstart', throttle(handleTouchStart), false);
   document.addEventListener('touchmove', throttle(handleTouchMove), false);
 
-  for (i = 0; i < selectPages.length; i++) {
+  for (var i = 0; i < selectPages.length; i++) {
     selectPages[i].addEventListener('click', selectPage.bind(null, i));
   }
 
@@ -188,25 +188,31 @@
     activePage.classList.add('active');
     areas = getAreas(activePage);
     areaIndex = isNext ? 0 : areas.length - 1;
+    isZoomOn && zoomOn();
   }
 
   function updateNavButton() {
     if (isLastPage()) {
       nextButton.classList.add('hidden');
+      zoomButton.disabled = true;
     } else {
+      zoomButton.disabled = !isPageMode;
       nextButton.classList.remove('hidden');
     }
 
     if (isFirstPage()) {
       prevButton.classList.add('hidden');
+      zoomButton.disabled = true;
     } else {
       prevButton.classList.remove('hidden');
+      zoomButton.disabled = !isPageMode;
     }
   }
 
   function switchMode(evt) {
     isPageMode = !isPageMode;
     evt.currentTarget.classList[isPageMode ? 'add' : 'remove']('active');
+    updateNavButton();
 
     if (isFirstPage() || isLastPage()) {
       return;
@@ -214,16 +220,14 @@
 
     if (isPageMode) {
       restoreViewBox();
-      zoomButton.disabled = false;
     } else {
       areaIndex = 0;
-      zoomButton.disabled = true;
       changeArea();
     }
   }
 
   function restoreViewBox() {
-    for (i = 1; i < pages.length - 1; i++) {
+    for (var i = 1; i < pages.length - 1; i++) {
       pages[i].setAttribute('viewBox', viewBoxes[i]);
       activeRect = rects[i - 1];
       activeRect.setAttribute('x', 0);
@@ -254,7 +258,7 @@
 
   function hideContentsPage() {
     setTimeout(function() {
-      for (i = 0; i < selectPages.length; i++) {
+      for (var i = 0; i < selectPages.length; i++) {
         selectPages[i].classList.remove('active');
       }
     }, DELAY);
@@ -278,8 +282,73 @@
 
     if (isZoomOn) {
       zoomButton.classList.add('active');
+      zoomOn();
     } else {
       zoomButton.classList.remove('active');
+      zoomOff();
     }
+  }
+
+  function zoomOn() {
+    var panZoom = activePage.panZoom;
+
+    if (panZoom) {
+      panZoom.pan({ x: 0, y: 0 });
+    } else {
+      panZoom = svgPanZoom(activePage, {
+        onZoom: onZoom,
+        zoomEnabled: false,
+        beforePan: beforePan
+      });
+
+      activePage.panZoom = panZoom;
+      activePage.isInit = true;
+      activePage.panZoom.zoom(2);
+      activePage.classList.add('zoom-on');
+      activePage.classList.remove('zoom-off');
+    }
+
+    function onZoom() {
+      if (!activePage.panZoom) {
+        return;
+      }
+
+      var sizes = activePage.panZoom.getSizes();
+      var realZoom = sizes.realZoom;
+      var viewBox = sizes.viewBox;
+
+      activePage.maxX = sizes.width - viewBox.width * realZoom;
+      activePage.maxY = sizes.height - viewBox.height * realZoom;
+    }
+
+    function beforePan(oldPan, newPan) {
+      if (activePage.isInit) {
+        activePage.isInit = false;
+        return { x: 0, y: 0 };
+      } else {
+        return {
+          x: Math.min(0, Math.max(activePage.maxX, newPan.x)),
+          y: Math.min(0, Math.max(activePage.maxY, newPan.y))
+        };
+      }
+    }
+  }
+
+  function zoomOff() {
+    var panZoom;
+
+    for (var i = 1; i < pages.length - 1; i++) {
+      panZoom = pages[i].panZoom;
+
+      if (panZoom) {
+        // panZoom.reset();
+        panZoom.destroy();
+        pages[i].classList.remove('zoom-on');
+        pages[i].classList.add('zoom-off');
+        pages[i].panZoom = null;
+      }
+    }
+
+    restoreViewBox();
   }
 })();

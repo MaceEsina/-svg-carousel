@@ -49,6 +49,14 @@ main {
   left: 100%;
 }
 
+.page.zoom-off .svg-pan-zoom_viewport {
+  transform: none !important;
+}
+
+.page.zoom-on .svg-pan-zoom_viewport {
+  transform: '';
+}
+
 nav {
   position: absolute;
   bottom: 0;
