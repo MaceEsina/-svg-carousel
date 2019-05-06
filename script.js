@@ -69,6 +69,10 @@
   }
 
   function handleTouchStart(evt) {
+    if (!isFirstPage() && !isLastPage() && isZoomOn) {
+      return;
+    }
+
     x1 = evt.touches[0].clientX;
     y1 = evt.touches[0].clientY;
   };
