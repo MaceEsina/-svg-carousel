@@ -228,6 +228,7 @@
     if (isPageMode) {
       restoreViewBox();
     } else {
+      zoomOff();
       areaIndex = 0;
       changeArea();
     }
